@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Enrolment Form</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px 15px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px #0003;
+        }
+
+        h1 {
+            text-align: center;
+            color: #5148c9;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: #5148c9;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+            margin-top: 28px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 7px;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 14px;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #6258e8;
+            box-shadow: 0 0 0 2px #6258e822;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 85px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            padding: 8px 0;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: normal;
+            margin: 0;
+        }
+
+        .radio-group input {
+            width: auto;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 28px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            background: #5b5be7;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #4545c5;
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: white;
+            color: #555;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #message {
+            text-align: center;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Student Enrolment Form</h1>
+    <p class="subtitle">Please fill in all required information.</p>
+
+    <form id="enrolmentForm">
+
+        <!-- STUDENT DETAILS -->
+        <h3 class="section-title">1. Student Details</h3>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label for="firstName">First Name *</label>
+                <input type="text" id="firstName" name="firstName"
+                       autocomplete="given-name" required>
+            </div>
+
+            <div class="field">
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" name="lastName"
+                       autocomplete="family-name" required>
+            </div>
+
+            <div class="field">
+                <label for="dob">Date of Birth *</label>
+                <input type="date" id="dob" name="dob" required>
+            </div>
+
+            <div class="field">
+                <label>Gender</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="gender" value="Male"> Male</label>
+                    <label><input type="radio" name="gender" value="Female"> Female</label>
+                    <label><input type="radio" name="gender" value="Other"> Other</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email"
+                       autocomplete="email" required>
+            </div>
+
+            <div class="field">
+                <label for="phone">Mobile Number *</label>
+                <input type="tel" id="phone" name="phone"
+                       autocomplete="tel" pattern="[0-9]{10}"
+                       maxlength="10" inputmode="numeric" required>
+            </div>
+
+            <div class="field full">
+                <label for="address">Full Address *</label>
+                <textarea id="address" name="address"
+                          autocomplete="street-address" required></textarea>
+            </div>
+
+            <div class="field">
+                <label for="city">City / Village *</label>
+                <input type="text" id="city" name="city" required>
+            </div>
+
+            <div class="field">
+                <label for="pincode">PIN Code</label>
+                <input type="text" id="pincode" name="pincode"
+                       inputmode="numeric" pattern="[0-9]{6}"
+                       maxlength="6">
+            </div>
+
+        </div>
+
+        <!-- PARENT DETAILS -->
+        <h3 class="section-title">2. Parent / Guardian Details</h3>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label for="parentName">Parent / Guardian Name *</label>
+                <input type="text" id="parentName" name="parentName"
+                       required>
+            </div>
+
+            <div class="field">
+                <label for="parentPhone">Parent Mobile Number *</label>
+                <input type="tel" id="parentPhone" name="parentPhone"
+                       pattern="[0-9]{10}" maxlength="10"
+                       inputmode="numeric" required>
+            </div>
+
+            <div class="field full">
+                <label for="parentEmail">Parent Email (Optional)</label>
+                <input type="email" id="parentEmail" name="parentEmail">
+            </div>
+
+        </div>
+
+        <!-- EDUCATION DETAILS -->
+        <h3 class="section-title">3. Education Details</h3>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label for="school">Previous School / College</label>
+                <input type="text" id="school" name="school">
+            </div>
+
+            <div class="field">
+                <label for="qualification">Last Qualification *</label>
+                <select id="qualification" name="qualification" required>
+                    <option value="">Select Qualification</option>
+                    <option>Below Class 10</option>
+                    <option>Class 10</option>
+                    <option>Class 12</option>
+                    <option>Diploma</option>
+                    <option>Graduate</option>
+                    <option>Postgraduate</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+        </div>
+
+        <!-- COURSE DETAILS -->
+        <h3 class="section-title">4. Course Enrolment Details</h3>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label for="course">Select Course *</label>
+                <select id="course" name="course" required>
+                    <option value="">Choose a Course</option>
+                    <option>Computer Basics</option>
+                    <option>MS Office</option>
+                    <option>Web Development</option>
+                    <option>Graphic Designing</option>
+                    <option>Digital Marketing</option>
+                    <option>Python Programming</option>
+                    <option>Tally / Accounting</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="mode">Learning Mode *</label>
+                <select id="mode" name="mode" required>
+                    <option value="">Select Mode</option>
+                    <option>Offline</option>
+                    <option>Online</option>
+                    <option>Hybrid</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="startDate">Preferred Start Date *</label>
+                <input type="date" id="startDate" name="startDate" required>
+            </div>
+
+            <div class="field">
+                <label for="shift">Preferred Timing *</label>
+                <select id="shift" name="shift" required>
+                    <option value="">Select Timing</option>
+                    <option>Morning</option>
+                    <option>Afternoon</option>
+                    <option>Evening</option>
+                    <option>Flexible</option>
+                </select>
+            </div>
+
+        </div>
+
+        <!-- ADDITIONAL INFORMATION -->
+        <h3 class="section-title">5. Additional Information</h3>
+
+        <div class="form-grid">
+
+            <div class="field full">
+                <label for="reason">Why do you want to join this course?</label>
+                <textarea id="reason" name="reason"
+                          placeholder="Write your reason here..."></textarea>
+            </div>
+
+            <div class="field full">
+                <label>
+                    <input type="checkbox" id="consent" required
+                           style="width:auto; margin-right:8px;">
+                    I confirm that the information provided is correct. *
+                </label>
+            </div>
+
+        </div>
+
+        <button type="submit" class="submit-btn">
+            Submit Enrolment
+        </button>
+
+        <button type="reset" class="reset-btn">
+            Clear Form
+        </button>
+
+        <p id="message" role="status" aria-live="polite"></p>
+
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById("enrolmentForm");
+    const message = document.getElementById("message");
+
+    // Prevent selecting a birth date in the future.
+    document.getElementById("dob").max =
+        new Date().toLocaleDateString("en-CA");
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        if (!form.reportValidity()) {
+            return;
+        }
+
+        message.textContent =
+            "Form validated successfully. Connect a backend to save your enrolment.";
+
+        message.style.color = "#287a36";
+    });
+
+    form.addEventListener("reset", function() {
+        message.textContent = "";
+    });
+</script>
+
+</body>
+</html>
