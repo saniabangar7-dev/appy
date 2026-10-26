@@ -1,0 +1,369 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Authentication</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px #0003;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .primary {
+            background: #5b5be7;
+            color: white;
+        }
+
+        .google {
+            background: white;
+            border: 1px solid #ccc;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .google span {
+            color: #4285f4;
+            font-size: 18px;
+        }
+
+        .logout {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .switch {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 14px;
+        }
+
+        .switch a {
+            color: #5b5be7;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 18px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            height: 1px;
+            background: #ddd;
+            flex: 1;
+        }
+
+        #message {
+            text-align: center;
+            overflow-wrap: anywhere;
+            font-size: 14px;
+        }
+
+        #dashboard {
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <section id="authSection">
+            <h2 id="formTitle">Welcome Back</h2>
+
+            <form id="authForm">
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Email address"
+                    autocomplete="email"
+                    required
+                >
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Password (minimum 6 characters)"
+                    autocomplete="current-password"
+                    minlength="6"
+                    required
+                >
+
+                <button type="submit" class="primary" id="submitBtn">
+                    Login with Email
+                </button>
+            </form>
+
+            <div class="divider">OR</div>
+
+            <button type="button" class="google" id="googleBtn">
+                <span>G</span> &nbsp; Continue with Google
+            </button>
+
+            <p class="switch">
+                <span id="switchText">Don't have an account?</span>
+                <a href="#" id="switchMode">Sign Up</a>
+            </p>
+        </section>
+
+        <section id="dashboard">
+            <h2>Welcome!</h2>
+            <p id="userName"></p>
+            <p id="userEmail"></p>
+            <button type="button" id="logoutBtn" class="logout">
+                Logout
+            </button>
+        </section>
+
+        <p id="message" role="status" aria-live="polite"></p>
+    </div>
+
+    <!-- Firebase Authentication: all in this HTML file -->
+    <script type="module">
+        import { initializeApp }
+            from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            GoogleAuthProvider,
+            signInWithPopup,
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+        // YOUR FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdyhAZJAPZidNSsBeyIuvlfo7abZs9V0k",
+            authDomain: "appy-c47c7.firebaseapp.com",
+            projectId: "appy-c47c7",
+            storageBucket: "appy-c47c7.firebasestorage.app",
+            messagingSenderId: "1037531271272",
+            appId: "1:1037531271272:web:d5bb54f59a258f4ae72bdd",
+            measurementId: "G-02BHCR6XXH"
+        };
+
+        // INITIALIZE FIREBASE
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // HTML ELEMENTS
+        const authSection = document.getElementById("authSection");
+        const dashboard = document.getElementById("dashboard");
+        const authForm = document.getElementById("authForm");
+        const formTitle = document.getElementById("formTitle");
+        const submitBtn = document.getElementById("submitBtn");
+        const googleBtn = document.getElementById("googleBtn");
+        const switchText = document.getElementById("switchText");
+        const switchMode = document.getElementById("switchMode");
+        const message = document.getElementById("message");
+        const passwordInput = document.getElementById("password");
+
+        let isSignup = false;
+
+        // SWITCH LOGIN AND SIGN UP
+        switchMode.addEventListener("click", (event) => {
+            event.preventDefault();
+
+            isSignup = !isSignup;
+
+            formTitle.textContent =
+                isSignup ? "Create Account" : "Welcome Back";
+
+            submitBtn.textContent =
+                isSignup ? "Create Account" : "Login with Email";
+
+            switchText.textContent =
+                isSignup
+                    ? "Already have an account?"
+                    : "Don't have an account?";
+
+            switchMode.textContent =
+                isSignup ? "Login" : "Sign Up";
+
+            passwordInput.autocomplete =
+                isSignup ? "new-password" : "current-password";
+
+            message.textContent = "";
+        });
+
+        // EMAIL SIGN UP AND LOGIN
+        authForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            message.textContent = "";
+            submitBtn.disabled = true;
+            googleBtn.disabled = true;
+
+            const email =
+                document.getElementById("email").value.trim();
+
+            const password = passwordInput.value;
+
+            try {
+                if (isSignup) {
+                    await createUserWithEmailAndPassword(
+                        auth, email, password
+                    );
+
+                    message.textContent =
+                        "Account created successfully!";
+                } else {
+                    await signInWithEmailAndPassword(
+                        auth, email, password
+                    );
+
+                    message.textContent = "Login successful!";
+                }
+            } catch (error) {
+                message.textContent = getErrorMessage(error.code);
+            } finally {
+                submitBtn.disabled = false;
+                googleBtn.disabled = false;
+
+                submitBtn.textContent =
+                    isSignup ? "Create Account" : "Login with Email";
+            }
+        });
+
+        // GOOGLE LOGIN
+        googleBtn.addEventListener("click", async () => {
+            message.textContent = "";
+            googleBtn.disabled = true;
+            submitBtn.disabled = true;
+            googleBtn.textContent = "Connecting to Google...";
+
+            try {
+                await signInWithPopup(auth, googleProvider);
+                message.textContent = "Google login successful!";
+            } catch (error) {
+                message.textContent = getErrorMessage(error.code);
+            } finally {
+                googleBtn.disabled = false;
+                submitBtn.disabled = false;
+                googleBtn.innerHTML =
+                    '<span>G</span> &nbsp; Continue with Google';
+            }
+        });
+
+        // AUTHENTICATION STATE AND DASHBOARD
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authSection.style.display = "none";
+                dashboard.style.display = "block";
+
+                document.getElementById("userName").textContent =
+                    "Name: " + (user.displayName || "User");
+
+                document.getElementById("userEmail").textContent =
+                    "Email: " + (user.email || "Not available");
+            } else {
+                authSection.style.display = "block";
+                dashboard.style.display = "none";
+
+                document.getElementById("userName").textContent = "";
+                document.getElementById("userEmail").textContent = "";
+            }
+        });
+
+        // LOGOUT
+        document.getElementById("logoutBtn")
+            .addEventListener("click", async () => {
+                try {
+                    await signOut(auth);
+                    message.textContent = "Logged out successfully!";
+                } catch (error) {
+                    message.textContent = getErrorMessage(error.code);
+                }
+            });
+
+        // ERROR HANDLING
+        function getErrorMessage(code) {
+            const errors = {
+                "auth/email-already-in-use":
+                    "This email is already registered.",
+                "auth/invalid-email":
+                    "Please enter a valid email address.",
+                "auth/invalid-credential":
+                    "Incorrect email or password.",
+                "auth/weak-password":
+                    "Password must be at least 6 characters.",
+                "auth/popup-closed-by-user":
+                    "Google login was cancelled.",
+                "auth/popup-blocked":
+                    "Allow popups and try again.",
+                "auth/unauthorized-domain":
+                    "Add this domain in Firebase Authorized domains.",
+                "auth/account-exists-with-different-credential":
+                    "This email is registered using another login method.",
+                "auth/network-request-failed":
+                    "Check your internet connection."
+            };
+
+            return errors[code] ||
+                "Something went wrong. Please try again.";
+        }
+    </script>
+</body>
+</html>
